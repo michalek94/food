@@ -1,21 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import SearchBar from '../components/SearchBar';
 import useResult from '../hooks/useResults';
+import SearchBar from '../components/SearchBar';
+import ResultsList from '../components/ResultsList';
 
 const SearchScreen = () => {
-    const [searchValue, setSearchValue] = useState('');
-    const [searchApi, result, errorMessage] = useResult();
+    const [term, setTerm] = useState('');
+    const [searchApi, results, errorMessage] = useResult();
+
+    const filterResultsByPrice = (price) => {
+        return results.filter(result => {
+            return result.price === price;
+        });
+    };
 
     return(
         <View style={styles.background}>
             <SearchBar 
-                searchValue={searchValue} 
-                onSearchValueChanged={setSearchValue}
-                onSearchSubmit={() => searchApi(searchValue)}
+                searchValue={term} 
+                onSearchValueChanged={setTerm}
+                onSearchSubmit={() => searchApi(term)}
             />
             {errorMessage ? <Text>{errorMessage}</Text> : null}
-            <Text>We have found {result.length}</Text>
+            <Text>We have found {results.length}</Text>
+            <ResultsList 
+                title='Cost effective' 
+                data={filterResultsByPrice('$')}
+            />
+            <ResultsList 
+                title='Big pricier' 
+                data={filterResultsByPrice('$$')}
+            />
+            <ResultsList 
+                title='Big spender' 
+                data={filterResultsByPrice('$$$')}
+            />
         </View>
     );
 };
